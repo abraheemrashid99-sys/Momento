@@ -76,6 +76,7 @@ class ChannelState:
     group_sums: List[torch.Tensor] = field(default_factory=list)   # what the server sees per slot (length d')
     misalignment_energy: float = 0.0
     noise_energy: float = 0.0
+    attacker_clip: Dict[int, float] = field(default_factory=dict)   # power-cap clip factor per attacker (1 = unclipped)
 
 
 class OTAChannel:
@@ -172,7 +173,7 @@ class OTAChannel:
         n_slots = cfg.n_slots
         gamma = torch.zeros(n_slots, device=self.device, dtype=torch.float64)
         group_sums: List[torch.Tensor] = []
-        mis_e = 0.0; noise_e = 0.0
+        mis_e = 0.0; noise_e = 0.0; att_clip: Dict[int, float] = {}
         rs = np.random.RandomState(cfg.seed * 32452843 + t)
         for g in range(n_slots):
             members = [i for i in torch.where(slot_of == g)[0].tolist()]
@@ -219,6 +220,7 @@ class OTAChannel:
                 want = v * gamma[g]                              # what must arrive: gamma * v (like an honest x_i = v)
                 need_p = want.norm() / (h[i].abs() + 1e-12)      # transmit amplitude required
                 clip = min(1.0, float(self.amp_budget / (need_p + 1e-12)))
+                att_clip[i] = clip
                 # attacker knows h_hat only; phase error from CSI error reduces its effective gain
                 phase_err = (h[i] / h_hat[i]); phase_err = phase_err / phase_err.abs()
                 y += clip * (phase_err.real) * want
@@ -229,7 +231,7 @@ class OTAChannel:
             noise_e += float((z / scale).pow(2).sum())
             group_sums.append((y / scale).float())
         return ChannelState(t, h, h_hat, participating, slot_of, gamma.float(), coord, self.sigma_z2,
-                            group_sums, mis_e, noise_e)
+                            group_sums, mis_e, noise_e, att_clip)
 
     def reconstruct(self, state: ChannelState, vec_dtx: torch.Tensor) -> torch.Tensor:
         """Place a d'-length aggregate back into a d-length vector."""

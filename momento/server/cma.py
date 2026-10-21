@@ -202,7 +202,10 @@ class CMA(Aggregator):
             if (self.t == self.warmup) or (self.calibration == "sliding" and self.t > self.warmup and len(self._null_D) >= self.min_null):
                 self._finalise_thresholds()
         # update direction
-        direction = self.gain * (self.omega[:, None] * self._mhat_at(self.t)).sum(0)
+        # gain ramp matched to FedAvgM(beta_ref): its effective step grows as (1-beta^t)/(1-beta)
+        beta_ref = 1.0 - 1.0 / self.gain if self.gain > 1 else 0.0
+        gain_t = (1 - beta_ref ** self.t) / (1 - beta_ref) if beta_ref > 0 else self.gain
+        direction = gain_t * (self.omega[:, None] * self._mhat_at(self.t)).sum(0)
         if self.adaptive:
             d2 = tilde * tilde
             self.v_fast = self.b2f * self.v_fast + (1 - self.b2f) * d2

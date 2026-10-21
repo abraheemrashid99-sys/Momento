@@ -146,6 +146,8 @@ class Simulator:
         agg_full = self.channel.reconstruct(state, agg_tx)
         # server step
         self.w = self.server_opt.step(self.w, agg_full)
+        if not torch.isfinite(self.w).all():
+            raise FloatingPointError(f"global model diverged (NaN/Inf) at round {t}; check server step size / gain")
         # reset ablation
         if c.get("ablation", {}).get("reset_state_at_window_end", False) and t == self.t_end - 1:
             self.server_opt.reset()
@@ -168,6 +170,7 @@ class Simulator:
             rec["attack_diag"] = {k: v for k, v in self.attack.diag.items() if k != "schedule"}
         if override:
             rec["attack_delivery_norm"] = float(next(iter(override.values())).norm())
+            rec["attack_clip_mean"] = float(np.mean(list(state.attacker_clip.values()))) if state.attacker_clip else None
         return rec
 
     def _tti_context(self, t, updates, override, selected):
