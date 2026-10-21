@@ -1,0 +1,30 @@
+_base_: ../base.yaml
+dataset:
+  name: cifar10
+  alpha: 0.5
+model:
+  name: resnet9
+  width: 64
+fl:
+  n_clients: 40
+  participation: 0.5
+  rounds: 300
+  local:
+    epochs: 2
+    batch: 64
+    lr: 0.05
+attack:
+  start: 100
+  window: 5
+  malicious_frac: 0.2
+  rho: 1.0
+server:
+  optimizer: fedadam
+  opt_kw:
+    eta_s: 0.02
+    beta1: 0.9
+    beta2: 0.99
+    tau: 0.001
+  aggregator: none
+run:
+  exp: E1_hook

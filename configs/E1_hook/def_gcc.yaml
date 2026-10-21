@@ -1,0 +1,7 @@
+_base_: cifar_fedavgm.yaml
+channel:
+  n_slots: 5
+server:
+  aggregator: group_cc
+  agg_kw:
+    radius: 1.0

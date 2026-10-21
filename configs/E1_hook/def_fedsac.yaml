@@ -1,0 +1,6 @@
+_base_: cifar_fedavgm.yaml
+channel:
+  n_slots: 5
+  slot_assignment: fixed
+server:
+  aggregator: fedsac

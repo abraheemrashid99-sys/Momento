@@ -1,0 +1,6 @@
+_base_: cifar_cma.yaml
+server:
+  opt_kw:
+    eta_s: 0.02
+  agg_kw:
+    adaptive: true

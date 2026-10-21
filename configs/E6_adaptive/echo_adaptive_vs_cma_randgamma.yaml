@@ -1,0 +1,7 @@
+_base_: echo_adaptive_vs_cma.yaml
+channel:
+  slot_assignment: random
+  n_slots: 2
+server:
+  agg_kw:
+    inner_aggregator: gm

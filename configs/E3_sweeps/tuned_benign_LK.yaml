@@ -1,0 +1,8 @@
+_base_: ../E1_hook/cifar_fedavgm.yaml
+fl:
+  local:
+    epochs: 1
+    batch: 32
+    lr: 0.1
+run:
+  exp: E3_sweeps

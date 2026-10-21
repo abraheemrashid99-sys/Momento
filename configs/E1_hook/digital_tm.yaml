@@ -1,0 +1,8 @@
+_base_: cifar_fedavgm.yaml
+channel:
+  fading: none
+  n_slots: 40
+server:
+  aggregator: group_tm
+  agg_kw:
+    trim_frac: 0.2

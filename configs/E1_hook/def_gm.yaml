@@ -1,0 +1,5 @@
+_base_: cifar_fedavgm.yaml
+channel:
+  n_slots: 5
+server:
+  aggregator: aircomp_gm

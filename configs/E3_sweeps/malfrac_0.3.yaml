@@ -1,0 +1,5 @@
+_base_: ../E1_hook/cifar_fedavgm.yaml
+attack:
+  malicious_frac: 0.3
+run:
+  exp: E3_sweeps

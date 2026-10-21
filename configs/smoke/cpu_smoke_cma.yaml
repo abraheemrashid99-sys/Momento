@@ -1,0 +1,12 @@
+_base_: cpu_smoke.yaml
+server:
+  optimizer: fedavg
+  opt_kw:
+    eta_s: 1.0
+  aggregator: cma
+  agg_kw:
+    K: 4
+    warmup_rounds: 10
+    alpha_fa: 0.05
+run:
+  exp: smoke

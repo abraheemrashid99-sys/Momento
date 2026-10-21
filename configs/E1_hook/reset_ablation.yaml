@@ -1,0 +1,3 @@
+_base_: cifar_fedavgm.yaml
+ablation:
+  reset_state_at_window_end: true

@@ -1,0 +1,6 @@
+_base_: ../E2_cma/cifar_cma.yaml
+channel:
+  fading: rician
+  rician_k_db: 6.0
+run:
+  exp: E4_channel

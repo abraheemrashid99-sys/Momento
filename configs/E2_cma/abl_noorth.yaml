@@ -1,0 +1,4 @@
+_base_: cifar_cma.yaml
+server:
+  agg_kw:
+    orth_consolidate: false

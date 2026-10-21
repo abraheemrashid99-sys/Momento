@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "momento"
+version = "0.1.0"
+description = "MEMENTO: Momentum-Memory Poisoning and Continuum-Momentum Defense for Over-the-Air Federated Learning"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+dependencies = [
+    "torch>=2.1",
+    "torchvision>=0.16",
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "pyyaml>=6.0",
+    "pandas>=2.0",
+    "matplotlib>=3.7",
+    "tqdm>=4.65",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+sionna = ["sionna>=0.19", "tensorflow>=2.14"]
+
+[tool.setuptools.packages.find]
+include = ["momento*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

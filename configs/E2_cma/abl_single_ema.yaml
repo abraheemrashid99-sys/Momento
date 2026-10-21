@@ -1,0 +1,6 @@
+_base_: cifar_cma.yaml
+server:
+  agg_kw:
+    K: 2
+    weights: slow
+    per_level: false

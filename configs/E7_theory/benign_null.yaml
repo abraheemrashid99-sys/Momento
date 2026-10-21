@@ -1,0 +1,8 @@
+_base_: ../E2_cma/cifar_cma.yaml
+attack:
+  name: none
+  malicious_frac: 0.0
+fl:
+  rounds: 200
+run:
+  exp: E7_theory

@@ -1,0 +1,6 @@
+_base_: ../E1_hook/cifar_fedavgm.yaml
+server:
+  opt_kw:
+    eta_s: 0.5
+run:
+  exp: E3_sweeps

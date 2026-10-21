@@ -1,0 +1,79 @@
+# MEMENTO base configuration. Every experiment config inherits from this via `_base_`.
+# All values here are documented defaults; experiment files override only what they change.
+seed: 0
+device: auto            # 'auto' | 'cuda' | 'cpu'
+
+dataset:
+  name: cifar10         # cifar10 | femnist | agnews | radioml | synthetic | synthetic_iq
+  root: data
+  subset: null          # int for quick runs
+  partition: dirichlet  # dirichlet | natural (femnist LEAF) | snr_band (radioml)
+  alpha: 0.5            # Dirichlet concentration; reviewers expect {0.1, 0.5, 1.0}
+
+model:
+  name: resnet9         # resnet9 | smallcnn | vtcnn2 | textcnn
+  width: 64
+
+fl:
+  n_clients: 40         # FedSAC uses K=40
+  participation: 0.5    # fraction of clients scheduled per round (partial participation)
+  rounds: 300
+  local:
+    epochs: 2
+    batch: 64
+    lr: 0.05            # Lachnit & Karame / BackFed "tuned benign" settings are swept in E3
+    momentum: 0.0
+    weight_decay: 0.0005
+
+channel:
+  fading: rayleigh      # rayleigh | rician | none (ideal digital)
+  rician_k_db: 6.0
+  snr_db: 10.0
+  power_control: inversion   # inversion | bev
+  truncation_db: -10.0
+  csi_error_var: 0.0
+  sparsify_frac: 1.0
+  error_feedback: true
+  n_slots: 1            # >1 for ROTAF / FedSAC / group_* defenses
+  slot_assignment: random
+  p_max: 1.0
+
+server:
+  optimizer: fedavgm    # fedavg | fedavgm | fedadam | fedyogi  (CMA requires fedavg)
+  opt_kw:
+    eta_s: 1.0
+    beta: 0.9           # FedAvgM (Reddi et al. 2021 / Hsu et al. 2019)
+  aggregator: none      # none | bev | rotaf | aircomp_gm | group_cc | group_tm | fedsac | tti | cma
+  agg_kw: {}
+
+attack:
+  name: none            # none | scale | neurotoxin | a3fl_lite | chameleon_lite | echo | echo_adam | echo_adaptive
+  malicious_frac: 0.2
+  start: 100
+  window: 5
+  rho: 1.0              # stealth budget relative to the attacker's own clean-update norm
+  target: 0
+  trigger: patch
+  trigger_kw: {}
+  poison_frac: 0.5
+  epochs: 2
+  batch: 64
+  lr: 0.05
+  neurotoxin_keep: 0.1
+  cold_quantile: 0.02
+  use_full_budget: true
+  precompensate: true
+  front_load: true
+  force_participation: true
+
+ablation:
+  reset_state_at_window_end: false
+
+eval:
+  every: 5
+  dense_after: 120      # evaluate every round for this many rounds after the attack window (lifespan)
+  tti_warmup: 20
+
+run:
+  root: runs
+  exp: default

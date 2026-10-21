@@ -1,0 +1,33 @@
+_base_: ../base.yaml
+dataset:
+  name: femnist
+  partition: natural
+model:
+  name: smallcnn
+  width: 32
+fl:
+  n_clients: 100
+  participation: 0.2
+  rounds: 300
+  local:
+    epochs: 2
+    batch: 32
+    lr: 0.05
+server:
+  optimizer: fedavgm
+  opt_kw:
+    eta_s: 1.0
+    beta: 0.9
+  aggregator: none
+attack:
+  name: echo
+  trigger: patch
+  trigger_kw:
+    size: 3
+  target: 0
+  start: 100
+  window: 5
+  malicious_frac: 0.2
+  rho: 1.0
+run:
+  exp: E5_modalities

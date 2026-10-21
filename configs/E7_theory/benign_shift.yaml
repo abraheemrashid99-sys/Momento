@@ -1,0 +1,7 @@
+_base_: benign_null.yaml
+channel:
+  snr_db: 10.0
+shift:
+  at: 120
+  snr_db: 0.0
+  alpha: 0.1

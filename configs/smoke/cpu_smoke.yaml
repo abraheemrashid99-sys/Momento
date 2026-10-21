@@ -1,0 +1,33 @@
+_base_: ../base.yaml
+dataset:
+  name: synthetic
+  subset: 1200
+model:
+  name: smallcnn
+  width: 8
+fl:
+  n_clients: 10
+  participation: 1.0
+  rounds: 40
+  local:
+    epochs: 1
+    batch: 64
+    lr: 0.05
+server:
+  optimizer: fedavgm
+  opt_kw:
+    eta_s: 1.0
+    beta: 0.9
+  aggregator: none
+attack:
+  name: echo
+  malicious_frac: 0.2
+  start: 15
+  window: 3
+  rho: 2.0
+  epochs: 1
+eval:
+  every: 2
+  dense_after: 25
+run:
+  exp: smoke

@@ -1,0 +1,33 @@
+_base_: ../base.yaml
+dataset:
+  name: radioml
+  partition: snr_band
+  alpha: 0.5
+model:
+  name: vtcnn2
+fl:
+  n_clients: 40
+  participation: 0.5
+  rounds: 200
+  local:
+    epochs: 2
+    batch: 128
+    lr: 0.01
+server:
+  optimizer: fedavgm
+  opt_kw:
+    eta_s: 1.0
+    beta: 0.9
+  aggregator: none
+attack:
+  name: echo
+  trigger: iq_add
+  target: 3
+  start: 80
+  window: 5
+  malicious_frac: 0.2
+  rho: 1.0
+  lr: 0.01
+  batch: 128
+run:
+  exp: E5_modalities

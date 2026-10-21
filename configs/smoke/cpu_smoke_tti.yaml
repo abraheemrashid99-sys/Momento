@@ -1,0 +1,13 @@
+_base_: cpu_smoke.yaml
+server:
+  optimizer: fedavgm
+  opt_kw:
+    eta_s: 1.0
+    beta: 0.9
+  aggregator: tti
+eval:
+  every: 2
+  dense_after: 25
+  tti_warmup: 8
+run:
+  exp: smoke

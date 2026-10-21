@@ -1,0 +1,4 @@
+_base_: cifar_cma.yaml
+server:
+  agg_kw:
+    K: 2

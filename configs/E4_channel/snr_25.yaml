@@ -1,0 +1,5 @@
+_base_: ../E2_cma/cifar_cma.yaml
+channel:
+  snr_db: 25
+run:
+  exp: E4_channel

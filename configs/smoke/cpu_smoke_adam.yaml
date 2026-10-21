@@ -1,0 +1,18 @@
+_base_: cpu_smoke.yaml
+server:
+  optimizer: fedadam
+  opt_kw:
+    eta_s: 0.05
+    beta1: 0.9
+    beta2: 0.99
+    tau: 0.001
+  aggregator: none
+attack:
+  name: echo_adam
+  malicious_frac: 0.2
+  start: 15
+  window: 3
+  rho: 2.0
+  epochs: 1
+run:
+  exp: smoke

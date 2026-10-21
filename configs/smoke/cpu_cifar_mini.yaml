@@ -1,0 +1,36 @@
+_base_: ../base.yaml
+dataset:
+  name: cifar10
+  subset: 5000
+  alpha: 0.5
+model:
+  name: smallcnn
+  width: 16
+fl:
+  n_clients: 10
+  participation: 1.0
+  rounds: 130
+  local:
+    epochs: 1
+    batch: 64
+    lr: 0.05
+channel:
+  snr_db: 10.0
+server:
+  optimizer: fedavgm
+  opt_kw:
+    eta_s: 1.0
+    beta: 0.9
+  aggregator: none
+attack:
+  name: echo
+  malicious_frac: 0.2
+  start: 70
+  window: 5
+  rho: 1.0
+  epochs: 1
+eval:
+  every: 5
+  dense_after: 50
+run:
+  exp: cpu_cifar_mini

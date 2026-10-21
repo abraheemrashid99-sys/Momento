@@ -1,0 +1,7 @@
+_base_: ../E2_cma/cifar_cma.yaml
+attack:
+  name: echo_adaptive
+  window: 30
+  adaptive_safety: 0.5
+run:
+  exp: E6_adaptive

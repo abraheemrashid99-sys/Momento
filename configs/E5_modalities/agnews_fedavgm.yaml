@@ -1,0 +1,31 @@
+_base_: ../base.yaml
+dataset:
+  name: agnews
+  alpha: 0.5
+model:
+  name: textcnn
+fl:
+  n_clients: 40
+  participation: 0.5
+  rounds: 150
+  local:
+    epochs: 1
+    batch: 64
+    lr: 0.05
+server:
+  optimizer: fedavgm
+  opt_kw:
+    eta_s: 1.0
+    beta: 0.9
+  aggregator: none
+attack:
+  name: echo
+  trigger: word
+  target: 0
+  start: 60
+  window: 5
+  malicious_frac: 0.2
+  rho: 1.0
+  epochs: 1
+run:
+  exp: E5_modalities

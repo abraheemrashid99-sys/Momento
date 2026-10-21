@@ -1,0 +1,5 @@
+_base_: ../E2_cma/cifar_cma.yaml
+channel:
+  sparsify_frac: 0.1
+run:
+  exp: E4_channel

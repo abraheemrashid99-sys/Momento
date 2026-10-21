@@ -1,0 +1,5 @@
+_base_: ../E1_hook/cifar_fedavgm.yaml
+dataset:
+  alpha: 0.1
+run:
+  exp: E3_sweeps
