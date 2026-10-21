@@ -50,7 +50,7 @@ attack:
   name: none            # none | scale | neurotoxin | a3fl_lite | chameleon_lite | echo | echo_adam | echo_adaptive
   malicious_frac: 0.2
   start: 100
-  window: 5
+  window: 20          # 5-round windows cannot plant a backdoor under the OTA power cap (see README); 5 is swept in E3
   rho: 1.0              # stealth budget relative to the attacker's own clean-update norm
   target: 0
   trigger: patch

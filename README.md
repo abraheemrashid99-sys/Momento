@@ -107,6 +107,16 @@ theory/        half_life.py, detector_null.py
 tests/         unit tests
 ```
 
+## A finding from the first real-data check (CPU, CIFAR-10 subset)
+
+Under truncated channel inversion every honest client scales its update so that the *weakest*
+scheduled client exactly meets the power cap; an attacker transmitting at full power can therefore
+deliver at most about |h_a|/|h_min| honest-sized updates per round, whatever it asks for (the
+simulator logs the clip factor as `attack_clip_mean`; we observed ~0.12 of the requested amplitude).
+A 5-round window is physically insufficient to plant a backdoor in a converged model, for *any*
+attack. Attack windows are therefore swept in {5, 20, 50} (E3) and the default is 20; the post-window
+persistence metrics (50 %-lifespan, ASR at +20/+50/+100) are the primary comparison between attacks.
+
 ## Threat model (summary)
 
 M of N clients are malicious and colluding, active only during rounds [t0, t0+τ). White-box
