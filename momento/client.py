@@ -41,7 +41,7 @@ def local_sgd(model: torch.nn.Module, w0: torch.Tensor, x: torch.Tensor, y: torc
                         p.grad.mul_(grad_mask[ptr:ptr + n].view_as(p))
                     ptr += n
             opt.step()
-            losses.append(float(loss)); steps += 1
+            losses.append(float(loss.detach())); steps += 1
             if max_steps and steps >= max_steps:
                 break
         if max_steps and steps >= max_steps:
