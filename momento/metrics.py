@@ -23,12 +23,14 @@ def evaluate(model, w, x, y, trigger, device, batch: int = 512) -> Dict[str, flo
     asr_hit = 0; asr_n = 0
     for i in range(0, x.shape[0], batch):
         xb, yb = x[i:i + batch].to(device), y[i:i + batch].to(device)
-        pred = model(xb).argmax(1)
+        with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=(device.type == "cuda")):
+            pred = model(xb).argmax(1)
         correct += int((pred == yb).sum()); n += yb.numel()
         if trigger is not None:
             keep = yb != trigger.target
             if keep.any():
-                pt = model(trigger.apply(xb[keep])).argmax(1)
+                with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=(device.type == "cuda")):
+                    pt = model(trigger.apply(xb[keep])).argmax(1)
                 asr_hit += int((pt == trigger.target).sum()); asr_n += int(keep.sum())
     out = {"MA": correct / max(n, 1)}
     if trigger is not None:

@@ -11,10 +11,17 @@ from .utils import params_to_vector, vector_to_params
 
 def iterate_minibatches(x: torch.Tensor, y: torch.Tensor, batch: int, gen: torch.Generator):
     n = x.shape[0]
-    perm = torch.randperm(n, generator=gen)
+    perm = torch.randperm(n, generator=gen).to(x.device)      # x, y may already live on the GPU
     for i in range(0, n, batch):
         idx = perm[i:i + batch]
         yield x[idx], y[idx]
+
+
+_AMP = {"enabled": True}
+
+
+def set_amp(enabled: bool) -> None:
+    _AMP["enabled"] = enabled
 
 
 def local_sgd(model: torch.nn.Module, w0: torch.Tensor, x: torch.Tensor, y: torch.Tensor, epochs: int, batch: int,
@@ -28,10 +35,12 @@ def local_sgd(model: torch.nn.Module, w0: torch.Tensor, x: torch.Tensor, y: torc
     losses = []; steps = 0
     for _ in range(epochs):
         for xb, yb in iterate_minibatches(x, y, batch, gen):
-            xb, yb = xb.to(device), yb.to(device)
+            xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
             opt.zero_grad(set_to_none=True)
-            out = model(xb)
-            loss = F.cross_entropy(out, yb) if loss_hook is None else loss_hook(model, xb, yb, out)
+            use_amp = _AMP["enabled"] and device.type == "cuda"
+            with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=use_amp):
+                out = model(xb)
+                loss = F.cross_entropy(out, yb) if loss_hook is None else loss_hook(model, xb, yb, out)
             loss.backward()
             if grad_mask is not None:
                 ptr = 0

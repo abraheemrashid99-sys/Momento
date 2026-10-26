@@ -32,7 +32,9 @@ class Simulator:
     def __init__(self, cfg: Dict, record: Optional[RunRecord] = None, verbose: bool = True):
         self.cfg = cfg
         self.seed = cfg.get("seed", 0)
-        set_seed(self.seed)
+        set_seed(self.seed, deterministic=cfg.get("deterministic", False))
+        from .client import set_amp
+        set_amp(cfg.get("amp", True))
         self.device = get_device(cfg.get("device", "auto"))
         self.verbose = verbose
         self.rec = record
@@ -74,8 +76,17 @@ class Simulator:
         self.malicious = sorted(rng.choice(N, M, replace=False).tolist()) if M > 0 else []
         # clients
         lcfg = fl["local"]
-        self.clients = {i: HonestClient(i, self.data.x_train[parts[i]], self.data.y_train[parts[i]], lcfg, self.device, self.seed)
-                        for i in range(N)}
+        # client shards live on the compute device (CIFAR-10 is ~600 MB in float32; fits on any modern GPU)
+        keep_on_device = c.get("data_on_device", True) and self.device.type == "cuda"
+        def shard(idx):
+            x, y = self.data.x_train[idx], self.data.y_train[idx]
+            return (x.to(self.device), y.to(self.device)) if keep_on_device else (x, y)
+        self.clients = {}
+        for i in range(N):
+            xs, ys = shard(parts[i])
+            self.clients[i] = HonestClient(i, xs, ys, lcfg, self.device, self.seed)
+        if keep_on_device:
+            self.data.x_test = self.data.x_test.to(self.device); self.data.y_test = self.data.y_test.to(self.device)
         # channel
         chcfg = dict(c["channel"]); chcfg["seed"] = self.seed
         self.channel = OTAChannel(OTAConfig(**chcfg), N, self.d, self.device)
@@ -91,8 +102,8 @@ class Simulator:
         trainer = None
         if self.malicious:
             a0 = self.malicious[0]
-            xa = torch.cat([self.data.x_train[parts[i]] for i in self.malicious])
-            ya = torch.cat([self.data.y_train[parts[i]] for i in self.malicious])
+            xa = torch.cat([self.clients[i].x for i in self.malicious])
+            ya = torch.cat([self.clients[i].y for i in self.malicious])
             trainer = BackdoorTrainer(self.trigger, xa, ya, acfg, self.device, self.seed)
         opt_factory = lambda: build_server_optimizer(self.opt_name, self.d, self.device, **scfg.get("opt_kw", {}))
         cma_factory = (lambda: CMA(self.channel.d_tx, self.device, **agg_kw)) if isinstance(self.agg, CMA) else None

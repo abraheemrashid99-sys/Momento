@@ -13,14 +13,19 @@ import torch
 import yaml
 
 
-def set_seed(seed: int) -> None:
+def set_seed(seed: int, deterministic: bool = False) -> None:
+    """Seeds Python/NumPy/Torch. Data partitions, client sampling, channels, triggers and attack schedules
+    are all driven by these seeds. `deterministic=True` additionally forces deterministic cuDNN kernels
+    (bit-exact reruns) at a large speed cost; off by default -- only low-order float noise differs."""
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    # Deterministic where it does not cost much. cudnn.benchmark off for reproducibility.
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = not deterministic
+    torch.backends.cudnn.deterministic = deterministic
+    if torch.cuda.is_available():
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
 
 
 def get_device(pref: str = "auto") -> torch.device:
