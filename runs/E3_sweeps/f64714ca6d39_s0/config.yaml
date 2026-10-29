@@ -1,0 +1,68 @@
+ablation:
+  reset_state_at_window_end: false
+attack:
+  batch: 64
+  cold_quantile: 0.02
+  epochs: 2
+  force_participation: true
+  front_load: true
+  lr: 0.05
+  malicious_frac: 0.2
+  name: echo
+  neurotoxin_keep: 0.1
+  poison_frac: 0.5
+  precompensate: true
+  rho: 1.0
+  start: 100
+  target: 0
+  trigger: patch
+  trigger_kw: {}
+  use_full_budget: true
+  window: 5
+channel:
+  csi_error_var: 0.0
+  error_feedback: true
+  fading: rayleigh
+  n_slots: 1
+  p_max: 1.0
+  power_control: inversion
+  rician_k_db: 6.0
+  slot_assignment: random
+  snr_db: 10.0
+  sparsify_frac: 1.0
+  truncation_db: -10.0
+dataset:
+  alpha: 0.1
+  name: cifar10
+  partition: dirichlet
+  root: data
+  subset: null
+device: auto
+eval:
+  dense_after: 120
+  every: 5
+  tti_warmup: 20
+fl:
+  local:
+    batch: 64
+    epochs: 2
+    lr: 0.05
+    momentum: 0.0
+    weight_decay: 0.0005
+  n_clients: 40
+  participation: 0.5
+  rounds: 300
+model:
+  name: resnet9
+  width: 64
+run:
+  exp: E3_sweeps
+  root: runs
+seed: 0
+server:
+  agg_kw: {}
+  aggregator: none
+  opt_kw:
+    beta: 0.9
+    eta_s: 1.0
+  optimizer: fedavgm
