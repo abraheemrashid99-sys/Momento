@@ -16,19 +16,32 @@ ap.add_argument("--quick", action="store_true")
 a = ap.parse_args()
 py = sys.executable
 
-# single-instance lock: a second copy (e.g. started by the logon task while one is already running) exits
-lock = os.path.join("runs", ".plan.lock")
-os.makedirs("runs", exist_ok=True)
-if os.path.exists(lock):
-    try:
-        pid = int(open(lock).read().strip())
-        alive = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"], capture_output=True, text=True).stdout if os.name == "nt" else ""
-        if (os.name == "nt" and str(pid) in alive) or (os.name != "nt" and os.path.exists(f"/proc/{pid}")):
-            print(f"[plan] another instance (pid {pid}) is already running; exiting."); sys.exit(0)
-    except Exception:
-        pass
-open(lock, "w").write(str(os.getpid()))
-import atexit; atexit.register(lambda: os.path.exists(lock) and os.remove(lock))
+# ---- OS-enforced single instance: a second copy exits immediately, however it was started
+def _acquire_single_instance():
+    if os.name == "nt":
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.CreateMutexW(None, True, "Global\\MomentoRunPlan")
+        if kernel32.GetLastError() == 183:          # ERROR_ALREADY_EXISTS
+            print("[plan] another instance is already running; exiting."); sys.exit(0)
+        return handle                                 # keep a reference for the lifetime of the process
+    else:
+        import fcntl
+        os.makedirs("runs", exist_ok=True)
+        fh = open(os.path.join("runs", ".plan.lock"), "w")
+        try:
+            fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            print("[plan] another instance is already running; exiting."); sys.exit(0)
+        return fh
+_LOCK = _acquire_single_instance()
+
+# ---- always run children with THIS interpreter (the launcher passes the venv python explicitly)
+if not os.path.exists(os.path.join(os.path.dirname(py), "Lib", "site-packages", "torch")) and os.name == "nt":
+    venv_py = os.path.join(os.getcwd(), ".venv", "Scripts", "python.exe")
+    if os.path.exists(venv_py) and os.path.abspath(venv_py) != os.path.abspath(py):
+        print(f"[plan] switching to venv interpreter {venv_py}")
+        py = venv_py
 for b in a.blocks:
     cmd = [py, "scripts/sweep.py", b, "--seeds", *map(str, a.seeds), "--run"] + (["--quick"] if a.quick else []) + (["--commit"] if a.commit else [])
     print("=" * 80, "\n[plan] block", b, "\n", " ".join(cmd), flush=True)

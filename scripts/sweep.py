@@ -43,7 +43,7 @@ def jobs(exp: str, seeds, quick: bool):
         for abl, s in itertools.product(["abl_K1", "abl_K2", "abl_K3", "abl_K6", "abl_nopurge", "abl_noorth", "abl_uniform", "abl_quantile", "abl_single_ema"], seeds):
             J.append([f"configs/E2_cma/{abl}.yaml", "attack.name=echo", f"seed={s}"] + q)
     elif exp == "E3":
-        files = sorted(os.listdir("configs/E3_sweeps"))
+        files = sorted(os.listdir("configs/E3_sweeps"), key=lambda f: (0 if f.startswith("window") else 1 if f.startswith("beta") else 2, f))
         for f, a, s in itertools.product(files, ["scale", "echo"], seeds):
             J.append([f"configs/E3_sweeps/{f}", f"attack.name={a}", f"seed={s}"] + q)
     elif exp == "E4":
