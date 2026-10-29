@@ -15,6 +15,20 @@ ap.add_argument("--commit", action="store_true", help="git commit+push runs/ and
 ap.add_argument("--quick", action="store_true")
 a = ap.parse_args()
 py = sys.executable
+
+# single-instance lock: a second copy (e.g. started by the logon task while one is already running) exits
+lock = os.path.join("runs", ".plan.lock")
+os.makedirs("runs", exist_ok=True)
+if os.path.exists(lock):
+    try:
+        pid = int(open(lock).read().strip())
+        alive = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"], capture_output=True, text=True).stdout if os.name == "nt" else ""
+        if (os.name == "nt" and str(pid) in alive) or (os.name != "nt" and os.path.exists(f"/proc/{pid}")):
+            print(f"[plan] another instance (pid {pid}) is already running; exiting."); sys.exit(0)
+    except Exception:
+        pass
+open(lock, "w").write(str(os.getpid()))
+import atexit; atexit.register(lambda: os.path.exists(lock) and os.remove(lock))
 for b in a.blocks:
     cmd = [py, "scripts/sweep.py", b, "--seeds", *map(str, a.seeds), "--run"] + (["--quick"] if a.quick else []) + (["--commit"] if a.commit else [])
     print("=" * 80, "\n[plan] block", b, "\n", " ".join(cmd), flush=True)
