@@ -11,12 +11,12 @@ import argparse, os, subprocess, sys
 ap = argparse.ArgumentParser()
 ap.add_argument("--seeds", nargs="+", type=int, default=[0, 1, 2])
 ap.add_argument("--blocks", nargs="+", default=["E3", "E1", "E2", "E7", "E4", "E6", "E5"])
-ap.add_argument("--commit", action="store_true", help="git commit+push results/ after every block")
+ap.add_argument("--commit", action="store_true", help="git commit+push runs/ and results/ after EVERY finished run (and tables after each block)")
 ap.add_argument("--quick", action="store_true")
 a = ap.parse_args()
 py = sys.executable
 for b in a.blocks:
-    cmd = [py, "scripts/sweep.py", b, "--seeds", *map(str, a.seeds), "--run"] + (["--quick"] if a.quick else [])
+    cmd = [py, "scripts/sweep.py", b, "--seeds", *map(str, a.seeds), "--run"] + (["--quick"] if a.quick else []) + (["--commit"] if a.commit else [])
     print("=" * 80, "\n[plan] block", b, "\n", " ".join(cmd), flush=True)
     subprocess.run(cmd, check=False)
     subprocess.run([py, "scripts/make_tables.py", "--root", "runs", "--out", "results"], check=False)

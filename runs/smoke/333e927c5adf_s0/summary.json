@@ -1,0 +1,18 @@
+{
+  "final_MA": 1.0,
+  "final_ASR": 0.7878787878787878,
+  "d": 23034,
+  "n_params": 23034,
+  "malicious": [
+    5,
+    9
+  ],
+  "lifespan_50": 3,
+  "auc_asr_post": 11.107954545454547,
+  "asr_at_end": 0.5946969696969697,
+  "asr_plus_20": 0.7727272727272727,
+  "asr_plus_50": NaN,
+  "asr_plus_100": NaN,
+  "asr_window_end": 0.03787878787878788,
+  "ma_window_end": 0.37666666666666665
+}

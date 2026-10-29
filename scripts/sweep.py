@@ -76,6 +76,7 @@ def main():
     ap.add_argument("--quick", action="store_true", help="short runs for debugging")
     ap.add_argument("--run", action="store_true")
     ap.add_argument("--root", default="runs")
+    ap.add_argument("--commit", action="store_true", help="after EVERY finished run: rebuild tables, git commit+push runs/ and results/")
     args = ap.parse_args()
     J = jobs(args.exp, args.seeds, args.quick)
     for j in J:
@@ -87,6 +88,12 @@ def main():
             if os.path.exists(os.path.join(run_dir, "summary.json")):
                 print(f"[skip] {run_dir}"); continue
             print("[run]", " ".join(j)); subprocess.run(cmd, check=False)
+            if args.commit and os.path.exists(os.path.join(run_dir, "summary.json")):
+                subprocess.run([sys.executable, "scripts/make_tables.py", "--root", args.root, "--out", "results"], check=False,
+                               stdout=subprocess.DEVNULL)
+                subprocess.run(["git", "add", "-A", args.root, "results"], check=False)
+                subprocess.run(["git", "commit", "-q", "-m", f"run finished: {' '.join(j)}"], check=False)
+                subprocess.run(["git", "push", "-q"], check=False)
         else:
             print(" ".join(cmd))
 

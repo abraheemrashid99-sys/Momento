@@ -1,0 +1,19 @@
+{
+  "final_MA": 1.0,
+  "final_ASR": 0.16287878787878787,
+  "d": 23034,
+  "n_params": 23034,
+  "malicious": [
+    5,
+    9
+  ],
+  "lifespan_50": 2,
+  "auc_asr_post": 7.3352272727272725,
+  "asr_at_end": 1.0,
+  "asr_plus_20": 0.14772727272727273,
+  "asr_plus_50": NaN,
+  "asr_plus_100": NaN,
+  "asr_window_end": 1.0,
+  "ma_window_end": 0.12,
+  "tti_total_extra_bytes": 3720.0
+}

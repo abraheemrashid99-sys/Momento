@@ -1,0 +1,27 @@
+{
+  "final_MA": 1.0,
+  "final_ASR": 0.9356060606060606,
+  "d": 23034,
+  "n_params": 23034,
+  "malicious": [
+    5,
+    9
+  ],
+  "lifespan_50": Infinity,
+  "auc_asr_post": 19.77462121212121,
+  "asr_at_end": 0.6136363636363636,
+  "asr_plus_20": 0.9393939393939394,
+  "asr_plus_50": NaN,
+  "asr_plus_100": NaN,
+  "asr_window_end": 0.8863636363636364,
+  "ma_window_end": 0.9933333333333333,
+  "det_tpr": 0.6666666666666666,
+  "det_fpr": 0.2,
+  "det_n_pos": 3,
+  "det_n_neg": 25,
+  "chi2_fit": {
+    "c": 0.8206496143227503,
+    "r": 0.7598516213629237,
+    "n": 30
+  }
+}
